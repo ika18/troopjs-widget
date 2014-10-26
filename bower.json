@@ -1,0 +1,16 @@
+{
+  "name": "troopjs-widget",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "troopjs-dom": "~5",
+    "poly": "~0.6",
+    "when": "~3",
+    "jquery": ">=1.8.1",
+    "mu-merge": "~0",
+    "mu-getargs": "~0"
+  }
+}
