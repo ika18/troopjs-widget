@@ -3,8 +3,12 @@
  */
 define([
 	"./component",
+	"troopjs-core/component/signal/initialize",
+	"troopjs-core/component/signal/start",
+	"troopjs-core/component/signal/stop",
+	"troopjs-core/component/signal/finalize",
 	"when"
-], function (Widget, when) {
+], function (Widget, initialize, start, stop, finalize, when) {
 	"use strict";
 
 	/**
@@ -44,7 +48,7 @@ define([
 			var args = arguments;
 
 			return when.map(this[COMPONENTS], function (component) {
-				return component.signal("initialize", args);
+				return initialize.apply(component, args);
 			});
 		},
 
@@ -59,7 +63,7 @@ define([
 
 			return when
 				.map(me[COMPONENTS], function (component) {
-					return component.signal("start", args);
+					return start.apply(component, args);
 				}).then(function () {
 					return me.weave.apply(me, args);
 				});
@@ -76,7 +80,7 @@ define([
 
 			return me.unweave.apply(me, args).then(function () {
 				return when.map(me[COMPONENTS], function (child) {
-					return child.signal("stop", args);
+					return stop.apply(child, args);
 				});
 			});
 		},
@@ -90,7 +94,7 @@ define([
 			var args = arguments;
 
 			return when.map(this[COMPONENTS], function (component) {
-				return component.signal("finalize", args);
+				return finalize.apply(component, args);
 			});
 		}
 	});
