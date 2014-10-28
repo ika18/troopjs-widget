@@ -16,8 +16,6 @@ define([
 	 * @alias widget.component
 	 * @mixin widget.config
 	 * @localdoc Adds functionality for working with the loom
-	 *  - {@link #method-weave}
-	 *  - {@link #method-unweave}
 	 */
 
 	var $ELEMENT = "$element";
