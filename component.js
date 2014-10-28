@@ -5,8 +5,9 @@ define([
 	"troopjs-dom/component",
 	"./config",
 	"./weave",
-	"./unweave"
-], function (Component, config, weave, unweave) {
+	"./unweave",
+	"./woven"
+], function (Component, config, weave, unweave, woven) {
 	"use strict";
 
 	/**
@@ -64,6 +65,13 @@ define([
 		 */
 		"unweave" : function () {
 			return unweave.apply(this[$ELEMENT].find(SELECTOR_WOVEN), arguments);
+		},
+
+		/**
+		 * @inheritdoc widget.woven#constructor
+		 */
+		"woven" : function () {
+			return woven.apply(this[$ELEMENT].find(SELECTOR_WOVEN), arguments);
 		}
 	});
 });
