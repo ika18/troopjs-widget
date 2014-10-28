@@ -3,10 +3,11 @@
  */
 define([
 	"./config",
+	"troopjs-core/component/signal/stop",
 	"when",
 	"jquery",
 	"poly/array"
-], function (config, when, $) {
+], function (config, stop, when, $) {
 	"use strict";
 
 	/**
@@ -99,12 +100,12 @@ define([
 						when($deferred).then(resolve, reject);
 
 						// Stop widget
-						widget.stop.call(widget, $deferred);
+						stop.call(widget, $deferred);
 					}
 					// TroopJS >= 2.x
 					else {
 						// Stop widget
-						widget.stop.apply(widget, stop_args).then(resolve, reject);
+						stop.apply(widget, stop_args).then(resolve, reject);
 					}
 
 					return promise

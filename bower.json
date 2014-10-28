@@ -6,6 +6,7 @@
     "bower_components"
   ],
   "dependencies": {
+    "troopjs-core": "develop",
     "troopjs-dom": "~5",
     "poly": "~0.6",
     "when": "~3",

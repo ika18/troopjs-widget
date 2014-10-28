@@ -3,12 +3,13 @@
  */
 define([
 	"./config",
+	"troopjs-core/component/signal/start",
 	"require",
 	"when",
 	"jquery",
 	"mu-getargs",
 	"poly/array"
-], function (config, parentRequire, when, $, getargs) {
+], function (config, start, parentRequire, when, $, getargs) {
 	"use strict";
 
 	/**
@@ -152,12 +153,12 @@ define([
 								.then(resolve, reject);
 
 							// Start widget
-							widget.start.call(widget, $deferred);
+							start.call(widget, $deferred);
 						}
 						// TroopJS >= 2.x
 						else {
 							// Start widget
-							widget.start.apply(widget, start_args)
+							start.apply(widget, start_args)
 								// Yield
 								.yield(widget)
 								// Link
