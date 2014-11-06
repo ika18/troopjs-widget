@@ -89,7 +89,7 @@ define([
 				: $data[$WEFT] = [];
 			var $weft_length = $weft[LENGTH];
 			// Scope `weave_re` locally since we use the `g` flag
-			var weave_re = /[\s,]*(((?:\w+!)?([\w\d_\/\.\-]+)(?:#[^(\s]+)?)(?:\(([^\)]+)\))?)/g;
+			var weave_re = /[\s,]*(((?:\w+!)?([\w\/\.\-]+)(?:#[^(\s]+)?)(?:\((.*?)\))?)/g;
 			// Let `weave_args` be `[]`
 			var weave_args = [];
 			var weave_args_length = 0;
@@ -98,7 +98,8 @@ define([
 			var matches;
 
 			// Iterate while `weave_re` matches
-			// matches[1] : full widget module name (could be loaded from plugin) - "mv!widget/name#1.x(1, 'string', false)"
+			// matches[0] : full widget module name with args - "mv!widget/name#1.x(1, 'string', false)"
+			// matches[1] : full widget module name without args - "mv!widget/name#1.x"
 			// matches[2] : widget name and arguments - "widget/name(1, 'string', false)"
 			// matches[3] : widget name - "widget/name"
 			// matches[4] : widget arguments - "1, 'string', false"
