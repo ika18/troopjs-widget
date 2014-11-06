@@ -98,8 +98,7 @@ define([
 			var matches;
 
 			// Iterate while `weave_re` matches
-			// matches[0] : full widget module name with args - "mv!widget/name#1.x(1, 'string', false)"
-			// matches[1] : full widget module name without args - "mv!widget/name#1.x"
+			// matches[1] : full widget module name with args - "mv!widget/name#1.x(1, 'string', false)"
 			// matches[2] : widget name and arguments - "widget/name(1, 'string', false)"
 			// matches[3] : widget name - "widget/name"
 			// matches[4] : widget arguments - "1, 'string', false"
