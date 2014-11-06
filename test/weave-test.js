@@ -43,7 +43,7 @@ buster.testCase("troopjs-widget/weave", function (run) {
 
 				"two widgets": {
 					"one with parameters": function () {
-						var $el = this.$el.attr("data-weave", "troopjs-widget/component troopjs-widget/component(true, 1, 'string')");
+						var $el = this.$el.attr("data-weave", "troopjs-widget/component troopjs-widget/component(true, 1, 'string()')");
 
 						return weave.call($el).spread(function (woven) {
 							// Two widgets received.
