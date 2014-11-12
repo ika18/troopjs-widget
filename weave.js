@@ -98,15 +98,15 @@ define([
 			var matches;
 
 			// Iterate while `weave_re` matches
-			// matches[1] : full widget module name with args - "mv!widget/name#1.x(1, 'string', false)"
-			// matches[2] : widget name and arguments - "widget/name(1, 'string', false)"
-			// matches[3] : widget name - "widget/name"
+			// matches[1] : max widget name with args - "mv!widget/name#1.x(1, 'string', false)"
+			// matches[2] : max widget name - "mv!widget/name#1.x"
+			// matches[3] : min widget name - "widget/name"
 			// matches[4] : widget arguments - "1, 'string', false"
 			while ((matches = weave_re.exec(weave_attr)) !== NULL) {
 				// Let `weave_arg` be [ $element, widget display name ].
 				weave_arg = [ $element, matches[3] ];
-				// Let `weave_arg[MODULE]` be `matches[3]`
-				weave_arg[MODULE] = matches[3];
+				// Let `weave_arg[MODULE]` be `matches[2]`
+				weave_arg[MODULE] = matches[2];
 				// If there were additional arguments ...
 				if ((args = matches[4]) !== UNDEFINED) {
 					// .. parse them using `getargs`, `.map` the values with `$map` and push to `weave_arg`
