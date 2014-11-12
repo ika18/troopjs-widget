@@ -42,7 +42,6 @@ define([
 	return function unweave() {
 		/**
 		 * Unweaves `$element`
-		 * @param {jQuery} $element
 		 * @param {String} unweave_attr
 		 * @return {Promise}
 		 * @private
