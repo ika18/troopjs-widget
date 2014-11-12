@@ -14,6 +14,7 @@ buster.testCase("troopjs-widget/weave", function (run) {
 
 			run({
 				"setUp": function () {
+					this.timeout = 2000;
 					this.$el = $("<div></div>");
 				},
 
