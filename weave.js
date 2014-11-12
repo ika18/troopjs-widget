@@ -87,12 +87,10 @@ define([
 			var $weft = $data.hasOwnProperty($WEFT)
 				? $data[$WEFT]
 				: $data[$WEFT] = [];
-			var $weft_length = $weft[LENGTH];
 			// Scope `weave_re` locally since we use the `g` flag
 			var weave_re = /[\s,]*(((?:\w+!)?([\w\/\.\-]+)(?:#[^(\s]+)?)(?:\((.*?)\))?)/g;
 			// Let `weave_args` be `[]`
 			var weave_args = [];
-			var weave_args_length = 0;
 			var weave_arg;
 			var args;
 			var matches;
@@ -104,7 +102,9 @@ define([
 			// matches[4] : widget arguments - "1, 'string', false"
 			while ((matches = weave_re.exec(weave_attr)) !== NULL) {
 				// Let `weave_arg` be [ $element, widget display name ].
-				weave_arg = [ $element, matches[3] ];
+				// Push `weave_arg` on `weave_args`
+				ARRAY_PUSH.call(weave_args, weave_arg = [ $element, matches[3] ]);
+
 				// Let `weave_arg[MODULE]` be `matches[2]`
 				weave_arg[MODULE] = matches[2];
 				// If there were additional arguments ...
@@ -114,11 +114,8 @@ define([
 				}
 
 				// Let `weave_arg[DEFERRED]` be `when.defer()`
-				// Let `$weft[$weft_length++]` be `weave_arg[DEFERRED].promise`
-				$weft[$weft_length++] = (weave_arg[DEFERRED] = when.defer()).promise;
-
-				// Push `weave_arg` on `weave_args`
-				weave_args[weave_args_length++] = weave_arg;
+				// Push `weave_arg[DEFERRED].promise` on `$weft`
+				ARRAY_PUSH.call($weft, (weave_arg[DEFERRED] = when.defer()).promise);
 			}
 
 			// Start async promise chain
