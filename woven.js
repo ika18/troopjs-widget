@@ -21,7 +21,7 @@ define([
 	var LENGTH = "length";
 	var $WEFT = config["$weft"];
 	var RE_ANY = /.*/;
-	var RE_WIDGET = /([\w\d_\/\.\-]+)(?:@(\d+))?/;
+	var RE_WIDGET = /([\w\/\.\-]+)(?:@(\d+))?/;
 
 	/**
 	 * Retrieve all or specific {@link widget.component widget} instances living on this element, that are

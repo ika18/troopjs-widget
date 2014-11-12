@@ -56,7 +56,7 @@ define([
 				? $data[$WEFT]
 				: $data[$WEFT] = [];
 			// Scope `unweave_re` locally since we use the `g` flag
-			var unweave_re = /[\s,]*([\w\d_\/\.\-]+)(?:@(\d+))?/g;
+			var unweave_re = /[\s,]*([\w\/\.\-]+)(?:@(\d+))?/g;
 			var unweave_res = [];
 			var unweave_res_length = 0;
 			var matches;
