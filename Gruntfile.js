@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 				"optimizeCss": "none",
 				"skipDirOptimize": true,
 				"keepBuildDir": true,
-				"fileExclusionRegExp": /^(?:\.(?!travis|gitignore)|node_modules|test|guides|(?:version|require|Gruntfile)\.js|(?:package|bower)\.json)/,
+				"fileExclusionRegExp": /^(?:\.(?!travis|gitignore)|node_modules|test|guides|(?:version|require|Gruntfile)\.js|package\.json)/,
 				"rawText": {
 					"troopjs-widget/version": "define([], { 'toString': function () { return <%= JSON.stringify(pkg.version) %>; } });\n"
 				}
