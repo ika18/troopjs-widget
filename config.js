@@ -2,19 +2,21 @@
  * @license MIT http://troopjs.mit-license.org/
  */
 define([
+	"troopjs-dom/config",
 	"module",
 	"mu-merge"
-], function (module, merge) {
+], function (config, module, merge) {
 	"use strict";
 
 	/**
 	 * Provides configuration for the widget package
 	 * @class widget.config
+	 * @extends dom.config
 	 * @protected
 	 * @alias feature.config
 	 */
 
-	return merge.call({
+	return merge.call(config, {
 		/**
 		 * @cfg {String} $weft Property of the widget where the **weft** resides.
 		 */
