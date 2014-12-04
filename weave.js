@@ -55,7 +55,7 @@ define([
 	 * 	.weave();
 	 *
 	 * @method constructor
-	 * @param {...*} [start_args] Arguments that will be passed to each widget's {@link widget.component#start start} method
+	 * @param {...*} [args] Arguments that will be passed to the {@link core.component.signal.start start} signal
 	 * @return {Promise} Promise for the completion of weaving all widgets.
 	 */
 	return function weave() {
@@ -150,7 +150,7 @@ define([
 								.then(resolve, reject);
 
 							// Start widget
-							start.call(widget, $deferred);
+							widget.start($deferred);
 						}
 						// TroopJS >= 2.x
 						else {
