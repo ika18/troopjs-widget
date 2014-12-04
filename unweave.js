@@ -3,11 +3,11 @@
  */
 define([
 	"./config",
-	"troopjs-core/component/signal/stop",
+	"troopjs-core/component/signal/finalize",
 	"when",
 	"jquery",
 	"poly/array"
-], function (config, stop, when, $) {
+], function (config, finalize, when, $) {
 	"use strict";
 
 	/**
@@ -36,7 +36,7 @@ define([
 	 * It also lives as a jquery plugin as {@link $#method-unweave}.
 	 *
 	 * @method constructor
-	 * @param {...*} [stop_args] Arguments that will be passed to each widget's {@link widget.component#stop stop} method
+	 * @param {...*} [args] Arguments that will be passed to the {@link core.component.signal.finalize finalize} signal
 	 * @return {Promise} Promise to the completion of unweaving all woven widgets.
 	 */
 	return function unweave() {
@@ -99,12 +99,12 @@ define([
 						when($deferred).then(resolve, reject);
 
 						// Stop widget
-						stop.call(widget, $deferred);
+						widget.stop($deferred);
 					}
 					// TroopJS >= 2.x
 					else {
-						// Stop widget
-						stop.apply(widget, stop_args).then(resolve, reject);
+						// Finalize widget
+						finalize.apply(widget, finalize_args).then(resolve, reject);
 					}
 
 					return promise
@@ -153,8 +153,8 @@ define([
 			});
 		};
 
-		// Let `stop_args` be `arguments`
-		var stop_args = arguments;
+		// Let `finalize_args` be `arguments`
+		var finalize_args = arguments;
 
 		// Wait for map (sync) and weave (async)
 		return when.all(ARRAY_MAP.call(this, function (element) {
