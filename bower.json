@@ -6,6 +6,6 @@
     "bower_components"
   ],
   "dependencies": {
-    "troopjs": "^3"
+    "troopjs": ">=3.0.0-pr.6"
   }
 }
