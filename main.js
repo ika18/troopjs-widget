@@ -97,7 +97,7 @@ define('troopjs-widget/weave',[
 	 * 	.weave();
 	 *
 	 * @method constructor
-	 * @param {...*} [start_args] Arguments that will be passed to each widget's {@link widget.component#start start} method
+	 * @param {...*} [args] Arguments that will be passed to the {@link core.component.signal.start start} signal
 	 * @return {Promise} Promise for the completion of weaving all widgets.
 	 */
 	return function weave() {
@@ -192,7 +192,7 @@ define('troopjs-widget/weave',[
 								.then(resolve, reject);
 
 							// Start widget
-							start.call(widget, $deferred);
+							widget.start($deferred);
 						}
 						// TroopJS >= 2.x
 						else {
@@ -256,11 +256,11 @@ define('troopjs-widget/weave',[
  */
 define('troopjs-widget/unweave',[
 	"./config",
-	"troopjs-core/component/signal/stop",
+	"troopjs-core/component/signal/finalize",
 	"when",
 	"jquery",
 	"poly/array"
-], function (config, stop, when, $) {
+], function (config, finalize, when, $) {
 	
 
 	/**
@@ -289,7 +289,7 @@ define('troopjs-widget/unweave',[
 	 * It also lives as a jquery plugin as {@link $#method-unweave}.
 	 *
 	 * @method constructor
-	 * @param {...*} [stop_args] Arguments that will be passed to each widget's {@link widget.component#stop stop} method
+	 * @param {...*} [args] Arguments that will be passed to the {@link core.component.signal.finalize finalize} signal
 	 * @return {Promise} Promise to the completion of unweaving all woven widgets.
 	 */
 	return function unweave() {
@@ -352,12 +352,12 @@ define('troopjs-widget/unweave',[
 						when($deferred).then(resolve, reject);
 
 						// Stop widget
-						stop.call(widget, $deferred);
+						widget.stop($deferred);
 					}
 					// TroopJS >= 2.x
 					else {
-						// Stop widget
-						stop.apply(widget, stop_args).then(resolve, reject);
+						// Finalize widget
+						finalize.apply(widget, finalize_args).then(resolve, reject);
 					}
 
 					return promise
@@ -406,8 +406,8 @@ define('troopjs-widget/unweave',[
 			});
 		};
 
-		// Let `stop_args` be `arguments`
-		var stop_args = arguments;
+		// Let `finalize_args` be `arguments`
+		var finalize_args = arguments;
 
 		// Wait for map (sync) and weave (async)
 		return when.all(ARRAY_MAP.call(this, function (element) {
