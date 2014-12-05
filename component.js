@@ -13,7 +13,7 @@ define([
 	/**
 	 * @class widget.component
 	 * @extend dom.component
-	 * @alias widget.component
+	 * @alias feature.component
 	 * @mixin widget.config
 	 * @localdoc Adds functionality for working with the loom
 	 */
