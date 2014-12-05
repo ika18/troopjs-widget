@@ -96,7 +96,11 @@ define([
 						$deferred = $.Deferred();
 
 						// Get trusted promise
-						when($deferred).then(resolve, reject);
+						when($deferred)
+							// Yield
+							.yield(widget)
+							// Link
+							.then(resolve, reject);
 
 						// Stop widget
 						widget.stop($deferred);
@@ -104,7 +108,11 @@ define([
 					// TroopJS >= 2.x
 					else {
 						// Finalize widget
-						finalize.apply(widget, finalize_args).then(resolve, reject);
+						finalize.apply(widget, finalize_args)
+							// Yield
+							.yield(widget)
+							// Link
+							.then(resolve, reject);
 					}
 
 					return promise
