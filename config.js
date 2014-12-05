@@ -12,33 +12,23 @@ define([
 	 * Provides configuration for the widget package
 	 * @class widget.config
 	 * @extends dom.config
-	 * @protected
+	 * @private
 	 * @alias feature.config
 	 */
 
-	return merge.call(config, {
+	return merge.call({}, config, {
 		/**
-		 * @cfg {String} $weft Property of the widget where the **weft** resides.
-		 * @protected
+		 * @cfg {Object} widget Widget related configuration
+		 * @cfg {String} [widget.$weft=$weft] Property of the widget where the **weft** resides.
+		 * @cfg {String} [widget.weave=data-weave] Attribute name of the element where the **weave** resides.
+		 * @cfg {String} [widget.unweave=data-unweave] Attribute name of the element where the **unweave** resides.
+		 * @cfg {String} [widget.woven=data-woven] Attribute name of the element where the **woven** resides.
 		 */
-		"$weft" : "$weft",
-
-		/**
-		 * @cfg {String} weave Attribute name of the element where the **weave** resides.
-		 * @protected
-		 */
-		"weave" : "data-weave",
-
-		/**
-		 * @cfg {String} unweave Attribute name of the element where the **unweave** resides.
-		 * @protected
-		 */
-		"unweave" : "data-unweave",
-
-		/**
-		 * @cfg {String} woven Attribute name of the element where the **woven** resides.
-		 * @protected
-		 */
-		"woven" : "data-woven"
+		"widget": {
+			"$weft" : "$weft",
+			"weave" : "data-weave",
+			"unweave" : "data-unweave",
+			"woven" : "data-woven"
+		}
 	}, module.config());
 });

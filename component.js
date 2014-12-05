@@ -19,8 +19,8 @@ define([
 	 */
 
 	var $ELEMENT = "$element";
-	var SELECTOR_WEAVE = "[" + config["weave"] + "]";
-	var SELECTOR_WOVEN = "[" + config["woven"] + "]";
+	var SELECTOR_WEAVE = "[" + config.widget.weave + "]";
+	var SELECTOR_WOVEN = "[" + config.widget.woven + "]";
 
 	function widget_weave() {
 		return weave.apply(this[$ELEMENT].find(SELECTOR_WEAVE), arguments);
