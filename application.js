@@ -26,14 +26,14 @@ define([
 	 * @inheritdoc
 	 * @param {jQuery|HTMLElement} $element The element that this widget should be attached to
 	 * @param {String} displayName A friendly name for this widget
-	 * @param {...core.component.base} component List of components to start before starting the application.
+	 * @param {...core.component.emitter} component List of components to start before starting the application.
 	 */
 	return Widget.extend(function ($element, displayName, component) {
 		/**
 		 * Application components
 		 * @private
 		 * @readonly
-		 * @property {core.component.base[]} components
+		 * @property {core.component.emitter[]} components
 		 */
 		this[COMPONENTS] = ARRAY_SLICE.call(arguments, 2);
 	}, {
