@@ -9,6 +9,30 @@ define([
 	"use strict";
 
 	/**
+	 * @class widget.config.widget
+	 * @enum
+	 * @private
+	 */
+	var WIDGET = {
+		/**
+		 * Property of the widget where the **weft** resides.
+		 */
+		"$weft" : "$weft",
+		/**
+		 * Attribute name of the element where the **weave** resides.
+		 */
+		"weave" : "data-weave",
+		/**
+		 * Attribute name of the element where the **unweave** resides.
+		 */
+		"unweave" : "data-unweave",
+		/**
+		 * Attribute name of the element where the **woven** resides.
+		 */
+		"woven" : "data-woven"
+	};
+
+	/**
 	 * Provides configuration for the widget package
 	 * @class widget.config
 	 * @extends dom.config
@@ -18,17 +42,10 @@ define([
 
 	return merge.call({}, config, {
 		/**
-		 * @cfg {Object} widget Widget related configuration
-		 * @cfg {String} [widget.$weft=$weft] Property of the widget where the **weft** resides.
-		 * @cfg {String} [widget.weave=data-weave] Attribute name of the element where the **weave** resides.
-		 * @cfg {String} [widget.unweave=data-unweave] Attribute name of the element where the **unweave** resides.
-		 * @cfg {String} [widget.woven=data-woven] Attribute name of the element where the **woven** resides.
+		 * Widget related configuration
+		 * @cfg {widget.config.widget}
+		 * @protected
 		 */
-		"widget": {
-			"$weft" : "$weft",
-			"weave" : "data-weave",
-			"unweave" : "data-unweave",
-			"woven" : "data-woven"
-		}
+		"widget": WIDGET
 	}, module.config());
 });
