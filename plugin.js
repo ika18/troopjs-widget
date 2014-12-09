@@ -29,7 +29,7 @@ define([
 	var WEAVE = "weave";
 	var UNWEAVE = "unweave";
 	var WOVEN = "woven";
-	var ATTR_WOVEN = config[WOVEN];
+	var ATTR_WOVEN = config.widget.woven;
 
 	/**
 	 * Tests if element has a data-woven attribute

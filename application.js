@@ -26,14 +26,14 @@ define([
 	 * @inheritdoc
 	 * @param {jQuery|HTMLElement} $element The element that this widget should be attached to
 	 * @param {String} displayName A friendly name for this widget
-	 * @param {...core.component.base} component List of components to start before starting the application.
+	 * @param {...core.component.emitter} component List of components to start before starting the application.
 	 */
 	return Widget.extend(function ($element, displayName, component) {
 		/**
 		 * Application components
 		 * @private
 		 * @readonly
-		 * @property {core.component.base[]} components
+		 * @property {core.component.emitter[]} components
 		 */
 		this[COMPONENTS] = ARRAY_SLICE.call(arguments, 2);
 	}, {
@@ -96,6 +96,24 @@ define([
 			return when.map(this[COMPONENTS], function (component) {
 				return finalize.apply(component, args);
 			});
-		}
+		},
+
+		/**
+		 * Start the component life-cycle, sends out {@link #event-sig/initialize} and then {@link #event-sig/start}.
+		 * @param {...*} [args] arguments
+		 * @return {Promise}
+		 * @fires sig/initialize
+		 * @fires sig/start
+		 */
+		"start": start,
+
+		/**
+		 * Stops the component life-cycle, sends out {@link #event-sig/stop} and then {@link #event-sig/finalize}.
+		 * @param {...*} [args] arguments
+		 * @return {Promise}
+		 * @fires sig/stop
+		 * @fires sig/finalize
+		 */
+		"stop": finalize
 	});
 });

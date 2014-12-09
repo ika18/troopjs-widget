@@ -11,33 +11,44 @@ define('troopjs-widget/config',[
 	
 
 	/**
+	 * @class widget.config.widget
+	 * @enum
+	 * @private
+	 */
+	var WIDGET = {
+		/**
+		 * Property of the widget where the **weft** resides.
+		 */
+		"$weft" : "$weft",
+		/**
+		 * Attribute name of the element where the **weave** resides.
+		 */
+		"weave" : "data-weave",
+		/**
+		 * Attribute name of the element where the **unweave** resides.
+		 */
+		"unweave" : "data-unweave",
+		/**
+		 * Attribute name of the element where the **woven** resides.
+		 */
+		"woven" : "data-woven"
+	};
+
+	/**
 	 * Provides configuration for the widget package
 	 * @class widget.config
 	 * @extends dom.config
-	 * @protected
+	 * @private
 	 * @alias feature.config
 	 */
 
-	return merge.call(config, {
+	return merge.call({}, config, {
 		/**
-		 * @cfg {String} $weft Property of the widget where the **weft** resides.
+		 * Widget related configuration
+		 * @cfg {widget.config.widget}
+		 * @protected
 		 */
-		"$weft" : "$weft",
-
-		/**
-		 * @cfg {String} weave Attribute name of the element where the **weave** resides.
-		 */
-		"weave" : "data-weave",
-
-		/**
-		 * @cfg {String} unweave Attribute name of the element where the **unweave** resides.
-		 */
-		"unweave" : "data-unweave",
-
-		/**
-		 * @cfg {String} woven Attribute name of the element where the **woven** resides.
-		 */
-		"woven" : "data-woven"
+		"widget": WIDGET
 	}, module.config());
 });
 /**
@@ -69,19 +80,153 @@ define('troopjs-widget/weave',[
 	var DEFERRED = "deferred";
 	var MODULE = "module";
 	var LENGTH = "length";
-	var $WEFT = config["$weft"];
-	var ATTR_WEAVE = config["weave"];
-	var ATTR_WOVEN = config["woven"];
+	var $WEFT = config.widget.$weft;
+	var ATTR_WEAVE = config.widget.weave;
+	var ATTR_WOVEN = config.widget.woven;
 	var RE_SEPARATOR = /[\s,]+/;
 
 	/**
-	 * Instantiate all {@link widget.component widgets}  specified in the {@link widget.config#weave weave attribute}
+	 * Weaves `$element`
+	 * @param {String} weave_attr
+	 * @param {Array} start_args
+	 * @return {Promise}
+	 * @ignore
+	 */
+	function $weave(weave_attr, start_args) {
+		// Let `$element` be `this`
+		var $element = this;
+
+		/**
+		 * Maps `value` to `$data[value]`
+		 * @param {*} value
+		 * @return {*}
+		 * @private
+		 */
+		var $map = function (value) {
+			return $data.hasOwnProperty(value)
+				? $data[value]
+				: value;
+		};
+
+		// Get all data from `$element`
+		var $data = $element.data();
+		// Let `$weft` be `$data[$WEFT]` or `$data[$WEFT] = []`
+		var $weft = $data.hasOwnProperty($WEFT)
+			? $data[$WEFT]
+			: $data[$WEFT] = [];
+		// Scope `weave_re` locally since we use the `g` flag
+		var weave_re = /[\s,]*(((?:\w+!)?([\w\/\.\-]+)(?:#[^(\s]+)?)(?:\((.*?)\))?)/g;
+		// Let `weave_args` be `[]`
+		var weave_args = [];
+		var weave_arg;
+		var args;
+		var matches;
+
+		// Iterate while `weave_re` matches
+		// matches[1] : max widget name with args - "mv!widget/name#1.x(1, 'string', false)"
+		// matches[2] : max widget name - "mv!widget/name#1.x"
+		// matches[3] : min widget name - "widget/name"
+		// matches[4] : widget arguments - "1, 'string', false"
+		while ((matches = weave_re.exec(weave_attr)) !== NULL) {
+			// Let `weave_arg` be [ $element, widget display name ].
+			// Push `weave_arg` on `weave_args`
+			ARRAY_PUSH.call(weave_args, weave_arg = [ $element, matches[3] ]);
+
+			// Let `weave_arg[MODULE]` be `matches[2]`
+			weave_arg[MODULE] = matches[2];
+			// If there were additional arguments ...
+			if ((args = matches[4]) !== UNDEFINED) {
+				// .. parse them using `getargs`, `.map` the values with `$map` and push to `weave_arg`
+				ARRAY_PUSH.apply(weave_arg, getargs.call(args).map($map));
+			}
+
+			// Let `weave_arg[DEFERRED]` be `when.defer()`
+			// Push `weave_arg[DEFERRED].promise` on `$weft`
+			ARRAY_PUSH.call($weft, (weave_arg[DEFERRED] = when.defer()).promise);
+		}
+
+		// Start async promise chain
+		return when
+			// Require, instantiate and start
+			.map(weave_args, function (widget_args) {
+				// Let `deferred` be `widget_args[DEFERRED]`
+				var deferred = widget_args[DEFERRED];
+
+				// Extract `resolve`, `reject` and `promise` from `deferred`
+				var resolve = deferred.resolve;
+				var reject = deferred.reject;
+
+				// Require `weave_arg[MODULE]`
+				parentRequire([ widget_args[MODULE] ], function (Widget) {
+					var widget;
+					var $deferred;
+
+					// Create widget instance
+					widget = Widget.apply(Widget, widget_args);
+
+					// TroopJS <= 1.x
+					if (widget.trigger) {
+						// Let `$deferred` be `$.Deferred()`
+						$deferred = $.Deferred();
+
+						// Get trusted promise
+						when($deferred)
+							// Yield
+							.yield(widget)
+							// Link
+							.then(resolve, reject);
+
+						// Start widget
+						widget.start($deferred);
+					}
+					// TroopJS >= 2.x
+					else {
+						// Start widget
+						start.apply(widget, start_args)
+							// Yield
+							.yield(widget)
+							// Link
+							.then(resolve, reject);
+					}
+				}, reject);
+
+				// Return `deferred.promise`
+				return deferred.promise;
+			})
+			// Update `ATTR_WOVEN`
+			.tap(function (widgets) {
+				// Bail fast if no widgets were woven
+				if (widgets[LENGTH] === 0) {
+					return;
+				}
+
+				// Map `Widget[]` to `String[]`
+				var woven = widgets.map(function (widget) {
+					return widget.toString();
+				});
+
+				// Update `$element` attribute `ATTR_WOVEN`
+				$element.attr(ATTR_WOVEN, function (index, attr) {
+					// Split `attr` and concat with `woven`
+					var values = (attr === UNDEFINED ? ARRAY_PROTO : attr.split(RE_SEPARATOR)).concat(woven);
+					// If `values[LENGTH]` is not `0` ...
+					return values[LENGTH] !== 0
+						// ... return `values.join(" ")`
+						? values.join(" ")
+						// ... otherwise return `NULL` to remove the attribute
+						: NULL;
+				});
+			});
+	}
+
+	/**
+	 * Instantiate all {@link widget.component widgets}  specified in the `data-weave` attribute
 	 * of this element, and to signal the widget for start with the arguments.
 	 *
 	 * The weaving will result in:
 	 *
-	 *  - Updates the {@link widget.config#weave woven attribute} with the created widget instances names.
-	 *  - The {@link widget.config#$weft $weft data property} will reference the widget instances.
+	 *  - Updates the `data-woven` attribute with the created widget instances names.
+	 *  - The `$weft` data property will reference the widget instances.
 	 *
 	 * @localdoc
 	 *
@@ -101,139 +246,6 @@ define('troopjs-widget/weave',[
 	 * @return {Promise} Promise for the completion of weaving all widgets.
 	 */
 	return function weave() {
-		/**
-		 * Weaves `$element`
-		 * @param {String} weave_attr
-		 * @return {Promise}
-		 * @private
-		 */
-		var $weave = function (weave_attr) {
-			// Let `$element` be `this`
-			var $element = this;
-
-			/**
-			 * Maps `value` to `$data[value]`
-			 * @param {*} value
-			 * @return {*}
-			 * @private
-			 */
-			var $map = function (value) {
-				return $data.hasOwnProperty(value)
-					? $data[value]
-					: value;
-			};
-
-			// Get all data from `$element`
-			var $data = $element.data();
-			// Let `$weft` be `$data[$WEFT]` or `$data[$WEFT] = []`
-			var $weft = $data.hasOwnProperty($WEFT)
-				? $data[$WEFT]
-				: $data[$WEFT] = [];
-			// Scope `weave_re` locally since we use the `g` flag
-			var weave_re = /[\s,]*(((?:\w+!)?([\w\/\.\-]+)(?:#[^(\s]+)?)(?:\((.*?)\))?)/g;
-			// Let `weave_args` be `[]`
-			var weave_args = [];
-			var weave_arg;
-			var args;
-			var matches;
-
-			// Iterate while `weave_re` matches
-			// matches[1] : max widget name with args - "mv!widget/name#1.x(1, 'string', false)"
-			// matches[2] : max widget name - "mv!widget/name#1.x"
-			// matches[3] : min widget name - "widget/name"
-			// matches[4] : widget arguments - "1, 'string', false"
-			while ((matches = weave_re.exec(weave_attr)) !== NULL) {
-				// Let `weave_arg` be [ $element, widget display name ].
-				// Push `weave_arg` on `weave_args`
-				ARRAY_PUSH.call(weave_args, weave_arg = [ $element, matches[3] ]);
-
-				// Let `weave_arg[MODULE]` be `matches[2]`
-				weave_arg[MODULE] = matches[2];
-				// If there were additional arguments ...
-				if ((args = matches[4]) !== UNDEFINED) {
-					// .. parse them using `getargs`, `.map` the values with `$map` and push to `weave_arg`
-					ARRAY_PUSH.apply(weave_arg, getargs.call(args).map($map));
-				}
-
-				// Let `weave_arg[DEFERRED]` be `when.defer()`
-				// Push `weave_arg[DEFERRED].promise` on `$weft`
-				ARRAY_PUSH.call($weft, (weave_arg[DEFERRED] = when.defer()).promise);
-			}
-
-			// Start async promise chain
-			return when
-				// Require, instantiate and start
-				.map(weave_args, function (widget_args) {
-					// Let `deferred` be `widget_args[DEFERRED]`
-					var deferred = widget_args[DEFERRED];
-
-					// Extract `resolve`, `reject` and `promise` from `deferred`
-					var resolve = deferred.resolve;
-					var reject = deferred.reject;
-
-					// Require `weave_arg[MODULE]`
-					parentRequire([ widget_args[MODULE] ], function (Widget) {
-						var widget;
-						var $deferred;
-
-						// Create widget instance
-						widget = Widget.apply(Widget, widget_args);
-
-						// TroopJS <= 1.x
-						if (widget.trigger) {
-							// Let `$deferred` be `$.Deferred()`
-							$deferred = $.Deferred();
-
-							// Get trusted promise
-							when($deferred)
-								// Yield
-								.yield(widget)
-								// Link
-								.then(resolve, reject);
-
-							// Start widget
-							widget.start($deferred);
-						}
-						// TroopJS >= 2.x
-						else {
-							// Start widget
-							start.apply(widget, start_args)
-								// Yield
-								.yield(widget)
-								// Link
-								.then(resolve, reject);
-						}
-					}, reject);
-
-					// Return `deferred.promise`
-					return deferred.promise;
-				})
-				// Update `ATTR_WOVEN`
-				.tap(function (widgets) {
-					// Bail fast if no widgets were woven
-					if (widgets[LENGTH] === 0) {
-						return;
-					}
-
-					// Map `Widget[]` to `String[]`
-					var woven = widgets.map(function (widget) {
-						return widget.toString();
-					});
-
-					// Update `$element` attribute `ATTR_WOVEN`
-					$element.attr(ATTR_WOVEN, function (index, attr) {
-						// Split `attr` and concat with `woven`
-						var values = (attr === UNDEFINED ? ARRAY_PROTO : attr.split(RE_SEPARATOR)).concat(woven);
-						// If `values[LENGTH]` is not `0` ...
-						return values[LENGTH] !== 0
-							// ... return `values.join(" ")`
-							? values.join(" ")
-							// ... otherwise return `NULL` to remove the attribute
-							: NULL;
-					});
-				});
-		};
-
 		// Let `start_args` be `arguments`
 		var start_args = arguments;
 
@@ -246,11 +258,68 @@ define('troopjs-widget/weave',[
 			// Make sure to remove ATTR_WEAVE asap in case someone else tries to `weave` again
 			$element.removeAttr(ATTR_WEAVE);
 			// Attempt weave
-			return $weave.call($element, weave_attr);
+			return $weave.call($element, weave_attr, start_args);
 		}));
 	}
 });
 
+/**
+ * @license MIT http://troopjs.mit-license.org/
+ */
+define('troopjs-core/component/signal/finalize',[
+	"./stop",
+	"../../config",
+	"when"
+], function (stop, config, when) {
+	var ARRAY_PUSH = Array.prototype.push;
+	var PHASE = "phase";
+	var STOPPED = config.phase.stopped;
+	var FINALIZE = config.phase.finalize;
+	var FINALIZED = config.phase.finalized;
+	var SIG_FINALIZE = config.signal.finalize;
+
+	/**
+	 * @class core.component.signal.finalize
+	 * @implement core.component.signal
+	 * @mixin core.config
+	 * @static
+	 * @alias feature.signal
+	 * @private
+	 */
+
+	/**
+	 * @method constructor
+	 * @inheritdoc
+	 * @localdoc Transitions the component {@link core.component.emitter#property-phase} to `finalized`
+	 */
+	return function finalize() {
+		var me = this;
+		var args = arguments;
+
+		return when(stop.apply(me, args), function (phase) {
+			var _args;
+
+			if (phase === STOPPED) {
+				// Let `me[PHASE]` be `FINALIZE`
+				me[PHASE] = FINALIZE;
+
+				// Let `_args` be `[ SIG_FINALIZE ]`
+				// Push `args` on `_args`
+				ARRAY_PUSH.apply(_args = [ SIG_FINALIZE ], args);
+
+				return me
+					.emit.apply(me, _args)
+					.then(function() {
+						// Let `me[PHASE]` be `FINALIZED`
+						return me[PHASE] = FINALIZED;
+					});
+			}
+			else {
+				return phase;
+			}
+		});
+	}
+});
 /**
  * @license MIT http://troopjs.mit-license.org/
  */
@@ -274,10 +343,132 @@ define('troopjs-widget/unweave',[
 	var ARRAY_PROTO = Array.prototype;
 	var ARRAY_MAP = ARRAY_PROTO.map;
 	var LENGTH = "length";
-	var $WEFT = config["$weft"];
-	var ATTR_WOVEN = config["woven"];
-	var ATTR_UNWEAVE = config["unweave"];
+	var $WEFT = config.widget.$weft;
+	var ATTR_WOVEN = config.widget.woven;
+	var ATTR_UNWEAVE = config.widget.unweave;
 	var RE_SEPARATOR = /[\s,]+/;
+
+	/**
+	 * Unweaves `$element`
+	 * @param {String} unweave_attr
+	 * @param {Array} finalize_args
+	 * @return {Promise}
+	 * @ignore
+	 */
+	function $unweave(unweave_attr, finalize_args) {
+		// Let `$element` be `this`
+		var $element = this;
+		// Get all data from `$element`
+		var $data = $element.data();
+		// Let `$weft` be `$data[$WEFT]` or `$data[$WEFT] = []`
+		var $weft = $data.hasOwnProperty($WEFT)
+			? $data[$WEFT]
+			: $data[$WEFT] = [];
+		// Scope `unweave_re` locally since we use the `g` flag
+		var unweave_re = /[\s,]*([\w\/\.\-]+)(?:@(\d+))?/g;
+		var unweave_res = [];
+		var unweave_res_length = 0;
+		var matches;
+
+		// Iterate unweave_attr (while unweave_re matches)
+		// matches[1] : widget name - "widget/name"
+		// matches[2] : widget instance id - "123"
+		while ((matches = unweave_re.exec(unweave_attr)) !== NULL) {
+			unweave_res[unweave_res_length++] = "^" + matches[1] + "@" + (matches[2] || "\\d+") + "$";
+		}
+
+		// Redefine `unweave_re` as a combined regexp
+		unweave_re = new RegExp(unweave_res.join("|"));
+
+		// Start async promise chain
+		return when
+			// Filter $weft
+			.filter($weft, function (widget, index) {
+				// Bail fast if we don't want to unweave
+				if (!unweave_re.test(widget.toString())) {
+					return false;
+				}
+
+				// Let `deferred` be `when.defer()`
+				var deferred = when.defer();
+				// Extract `resolve`, `reject` from `deferred`
+				var resolve = deferred.resolve;
+				var reject = deferred.reject;
+				// Let `$weft[index]` be `deferred.promise`
+				// Let `promise` be `$weft[index]`
+				var promise = $weft[index] = deferred.promise;
+				var $deferred;
+
+				// TroopJS <= 1.x
+				if (widget.trigger) {
+					// Let `$deferred` be `$.Deferred()`
+					$deferred = $.Deferred();
+
+					// Get trusted promise
+					when($deferred)
+						// Yield
+						.yield(widget)
+						// Link
+						.then(resolve, reject);
+
+					// Stop widget
+					widget.stop($deferred);
+				}
+				// TroopJS >= 2.x
+				else {
+					// Finalize widget
+					finalize.apply(widget, finalize_args)
+						// Yield
+						.yield(widget)
+						// Link
+						.then(resolve, reject);
+				}
+
+				return promise
+					// Make sure to remove the promise from `$weft`
+					.tap(function () {
+						delete $weft[index];
+					})
+					.yield(true);
+			})
+			.tap(function (widgets) {
+				// Bail fast if no widgets were unwoven
+				if (widgets[LENGTH] === 0) {
+					return;
+				}
+
+				// Let `unwoven` be a combined regexp of unwoven `widget.toString()`
+				var unwoven = new RegExp(
+					widgets
+						.map(function (widget) {
+							return "^" + widget.toString() + "$";
+						})
+						.join("|")
+				);
+
+				/**
+				 * Filters values using `unwoven`
+				 * @param {String} value
+				 * @return {boolean}
+				 * @ignore
+				 */
+				var filter = function (value) {
+					return !unwoven.test(value);
+				};
+
+				// Update `$element` attribute `ATTR_WOVEN`
+				$element.attr(ATTR_WOVEN, function (index, attr) {
+					// Split `attr` and filter with `filter`
+					var values = (attr === UNDEFINED ? ARRAY_PROTO : attr.split(RE_SEPARATOR)).filter(filter);
+					// If `values[LENGTH]` is not `0` ...
+					return values[LENGTH] !== 0
+						// ... return `values.join(" ")`
+						? values.join(" ")
+						// ... otherwise return `NULL` to remove the attribute
+						: NULL;
+				});
+			});
+	}
 
 	/**
 	 * Destroy all {@link widget.component widget} instances living on this element, that are created
@@ -293,119 +484,6 @@ define('troopjs-widget/unweave',[
 	 * @return {Promise} Promise to the completion of unweaving all woven widgets.
 	 */
 	return function unweave() {
-		/**
-		 * Unweaves `$element`
-		 * @param {String} unweave_attr
-		 * @return {Promise}
-		 * @private
-		 */
-		var $unweave = function (unweave_attr) {
-			// Let `$element` be `this`
-			var $element = this;
-			// Get all data from `$element`
-			var $data = $element.data();
-			// Let `$weft` be `$data[$WEFT]` or `$data[$WEFT] = []`
-			var $weft = $data.hasOwnProperty($WEFT)
-				? $data[$WEFT]
-				: $data[$WEFT] = [];
-			// Scope `unweave_re` locally since we use the `g` flag
-			var unweave_re = /[\s,]*([\w\/\.\-]+)(?:@(\d+))?/g;
-			var unweave_res = [];
-			var unweave_res_length = 0;
-			var matches;
-
-			// Iterate unweave_attr (while unweave_re matches)
-			// matches[1] : widget name - "widget/name"
-			// matches[2] : widget instance id - "123"
-			while ((matches = unweave_re.exec(unweave_attr)) !== NULL) {
-				unweave_res[unweave_res_length++] = "^" + matches[1] + "@" + (matches[2] || "\\d+") + "$";
-			}
-
-			// Redefine `unweave_re` as a combined regexp
-			unweave_re = new RegExp(unweave_res.join("|"));
-
-			// Start async promise chain
-			return when
-				// Filter $weft
-				.filter($weft, function (widget, index) {
-					// Bail fast if we don't want to unweave
-					if (!unweave_re.test(widget.toString())) {
-						return false;
-					}
-
-					// Let `deferred` be `when.defer()`
-					var deferred = when.defer();
-					// Extract `resolve`, `reject` from `deferred`
-					var resolve = deferred.resolve;
-					var reject = deferred.reject;
-					// Let `$weft[index]` be `deferred.promise`
-					// Let `promise` be `$weft[index]`
-					var promise = $weft[index] = deferred.promise;
-					var $deferred;
-
-					// TroopJS <= 1.x
-					if (widget.trigger) {
-						// Let `$deferred` be `$.Deferred()`
-						$deferred = $.Deferred();
-
-						// Get trusted promise
-						when($deferred).then(resolve, reject);
-
-						// Stop widget
-						widget.stop($deferred);
-					}
-					// TroopJS >= 2.x
-					else {
-						// Finalize widget
-						finalize.apply(widget, finalize_args).then(resolve, reject);
-					}
-
-					return promise
-						// Make sure to remove the promise from `$weft`
-						.tap(function () {
-							delete $weft[index];
-						})
-						.yield(true);
-			})
-			.tap(function (widgets) {
-					// Bail fast if no widgets were unwoven
-					if (widgets[LENGTH] === 0) {
-						return;
-					}
-
-					// Let `unwoven` be a combined regexp of unwoven `widget.toString()`
-					var unwoven = new RegExp(
-						widgets
-							.map(function (widget) {
-								return "^" + widget.toString() + "$";
-							})
-							.join("|")
-					);
-
-					/**
-					 * Filters values using `unwoven`
-					 * @param {String} value
-					 * @return {boolean}
-					 * @ignore
-					 */
-					var filter = function (value) {
-						return !unwoven.test(value);
-					};
-
-					// Update `$element` attribute `ATTR_WOVEN`
-					$element.attr(ATTR_WOVEN, function (index, attr) {
-						// Split `attr` and filter with `filter`
-						var values = (attr === UNDEFINED ? ARRAY_PROTO : attr.split(RE_SEPARATOR)).filter(filter);
-						// If `values[LENGTH]` is not `0` ...
-						return values[LENGTH] !== 0
-							// ... return `values.join(" ")`
-							? values.join(" ")
-							// ... otherwise return `NULL` to remove the attribute
-							: NULL;
-					});
-			});
-		};
-
 		// Let `finalize_args` be `arguments`
 		var finalize_args = arguments;
 
@@ -418,7 +496,7 @@ define('troopjs-widget/unweave',[
 			// Make sure to remove ATTR_UNWEAVE asap in case someone else tries to `unweave` again
 			$element.removeAttr(ATTR_UNWEAVE);
 			// Attempt weave
-			return $unweave.call($element, unweave_attr);
+			return $unweave.call($element, unweave_attr, finalize_args);
 		}));
 	};
 });
@@ -444,7 +522,7 @@ define('troopjs-widget/woven',[
 	var NULL = null;
 	var ARRAY_MAP = Array.prototype.map;
 	var LENGTH = "length";
-	var $WEFT = config["$weft"];
+	var $WEFT = config.widget.$weft;
 	var RE_ANY = /.*/;
 	var RE_WIDGET = /([\w\/\.\-]+)(?:@(\d+))?/;
 
@@ -504,14 +582,14 @@ define('troopjs-widget/component',[
 	/**
 	 * @class widget.component
 	 * @extend dom.component
-	 * @alias widget.component
+	 * @alias feature.component
 	 * @mixin widget.config
 	 * @localdoc Adds functionality for working with the loom
 	 */
 
 	var $ELEMENT = "$element";
-	var SELECTOR_WEAVE = "[" + config["weave"] + "]";
-	var SELECTOR_WOVEN = "[" + config["woven"] + "]";
+	var SELECTOR_WEAVE = "[" + config.widget.weave + "]";
+	var SELECTOR_WOVEN = "[" + config.widget.woven + "]";
 
 	function widget_weave() {
 		return weave.apply(this[$ELEMENT].find(SELECTOR_WEAVE), arguments);
@@ -544,7 +622,7 @@ define('troopjs-widget/component',[
 		},
 
 		/**
-		 * @method weave
+		 * @method
 		 * @inheritdoc widget.weave#constructor
 		 */
 		"weave" : widget_weave,
@@ -593,14 +671,14 @@ define('troopjs-widget/application',[
 	 * @inheritdoc
 	 * @param {jQuery|HTMLElement} $element The element that this widget should be attached to
 	 * @param {String} displayName A friendly name for this widget
-	 * @param {...core.component.base} component List of components to start before starting the application.
+	 * @param {...core.component.emitter} component List of components to start before starting the application.
 	 */
 	return Widget.extend(function ($element, displayName, component) {
 		/**
 		 * Application components
 		 * @private
 		 * @readonly
-		 * @property {core.component.base[]} components
+		 * @property {core.component.emitter[]} components
 		 */
 		this[COMPONENTS] = ARRAY_SLICE.call(arguments, 2);
 	}, {
@@ -663,7 +741,25 @@ define('troopjs-widget/application',[
 			return when.map(this[COMPONENTS], function (component) {
 				return finalize.apply(component, args);
 			});
-		}
+		},
+
+		/**
+		 * Start the component life-cycle, sends out {@link #event-sig/initialize} and then {@link #event-sig/start}.
+		 * @param {...*} [args] arguments
+		 * @return {Promise}
+		 * @fires sig/initialize
+		 * @fires sig/start
+		 */
+		"start": start,
+
+		/**
+		 * Stops the component life-cycle, sends out {@link #event-sig/stop} and then {@link #event-sig/finalize}.
+		 * @param {...*} [args] arguments
+		 * @return {Promise}
+		 * @fires sig/stop
+		 * @fires sig/finalize
+		 */
+		"stop": finalize
 	});
 });
 
@@ -698,7 +794,7 @@ define('troopjs-widget/plugin',[
 	var WEAVE = "weave";
 	var UNWEAVE = "unweave";
 	var WOVEN = "woven";
-	var ATTR_WOVEN = config[WOVEN];
+	var ATTR_WOVEN = config.widget.woven;
 
 	/**
 	 * Tests if element has a data-woven attribute

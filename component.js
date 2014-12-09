@@ -13,14 +13,14 @@ define([
 	/**
 	 * @class widget.component
 	 * @extend dom.component
-	 * @alias widget.component
+	 * @alias feature.component
 	 * @mixin widget.config
 	 * @localdoc Adds functionality for working with the loom
 	 */
 
 	var $ELEMENT = "$element";
-	var SELECTOR_WEAVE = "[" + config["weave"] + "]";
-	var SELECTOR_WOVEN = "[" + config["woven"] + "]";
+	var SELECTOR_WEAVE = "[" + config.widget.weave + "]";
+	var SELECTOR_WOVEN = "[" + config.widget.woven + "]";
 
 	function widget_weave() {
 		return weave.apply(this[$ELEMENT].find(SELECTOR_WEAVE), arguments);
@@ -53,7 +53,7 @@ define([
 		},
 
 		/**
-		 * @method weave
+		 * @method
 		 * @inheritdoc widget.weave#constructor
 		 */
 		"weave" : widget_weave,

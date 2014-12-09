@@ -19,7 +19,7 @@ define([
 	var NULL = null;
 	var ARRAY_MAP = Array.prototype.map;
 	var LENGTH = "length";
-	var $WEFT = config["$weft"];
+	var $WEFT = config.widget.$weft;
 	var RE_ANY = /.*/;
 	var RE_WIDGET = /([\w\/\.\-]+)(?:@(\d+))?/;
 

@@ -4,6 +4,7 @@ bower_components/../main.js
 bower_components/../version.js
 bower_components/../config.js
 bower_components/../weave.js
+bower_components/troopjs-core/component/signal/finalize.js
 bower_components/../unweave.js
 bower_components/../woven.js
 bower_components/../component.js
