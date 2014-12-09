@@ -96,6 +96,24 @@ define([
 			return when.map(this[COMPONENTS], function (component) {
 				return finalize.apply(component, args);
 			});
-		}
+		},
+
+		/**
+		 * Start the component life-cycle, sends out {@link #event-sig/initialize} and then {@link #event-sig/start}.
+		 * @param {...*} [args] arguments
+		 * @return {Promise}
+		 * @fires sig/initialize
+		 * @fires sig/start
+		 */
+		"start": start,
+
+		/**
+		 * Stops the component life-cycle, sends out {@link #event-sig/stop} and then {@link #event-sig/finalize}.
+		 * @param {...*} [args] arguments
+		 * @return {Promise}
+		 * @fires sig/stop
+		 * @fires sig/finalize
+		 */
+		"stop": finalize
 	});
 });

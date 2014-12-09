@@ -53,7 +53,7 @@ define([
 		},
 
 		/**
-		 * @method weave
+		 * @method
 		 * @inheritdoc widget.weave#constructor
 		 */
 		"weave" : widget_weave,
