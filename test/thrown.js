@@ -1,7 +1,7 @@
 /**
  * @license MIT http://troopjs.mit-license.org/
  */
-define([ "./default"], function (Widget) {
+define([ "./default" ], function (Widget) {
 	"use strict";
 
 	/**

@@ -7,7 +7,7 @@ define([
 	"troopjs-core/component/signal/start",
 	"troopjs-core/component/signal/stop",
 	"troopjs-core/component/signal/finalize",
-	"when"
+	"when/when"
 ], function (Widget, initialize, start, stop, finalize, when) {
 	"use strict";
 

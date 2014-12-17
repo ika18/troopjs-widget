@@ -9,7 +9,7 @@ buster.testCase("troopjs-widget/unweave", function (run) {
 			"troopjs-widget/component",
 			"troopjs-widget/weave",
 			"troopjs-widget/unweave",
-			"when",
+			"when/when",
 			"jquery"
 		],
 		function (Widget, weave, unweave, when, $) {

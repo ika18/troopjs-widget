@@ -4,7 +4,7 @@
 define([
 	"./config",
 	"troopjs-core/component/signal/finalize",
-	"when",
+	"when/when",
 	"jquery",
 	"poly/array"
 ], function (config, finalize, when, $) {
