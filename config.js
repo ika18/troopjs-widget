@@ -4,7 +4,7 @@
 define([
 	"troopjs-dom/config",
 	"module",
-	"mu-merge"
+	"mu-merge/main"
 ], function (config, module, merge) {
 	"use strict";
 

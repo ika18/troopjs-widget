@@ -5,9 +5,9 @@ define([
 	"./config",
 	"troopjs-core/component/signal/start",
 	"require",
-	"when",
+	"when/when",
 	"jquery",
-	"mu-getargs",
+	"mu-getargs/main",
 	"poly/array"
 ], function (config, start, parentRequire, when, $, getargs) {
 	"use strict";
