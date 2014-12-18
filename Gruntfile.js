@@ -42,8 +42,8 @@ define(['troopjs-widget/version'], function (version) {\n\
 						"name": "troopjs-widget/main",
 						"exclude": [
 							"jquery",
-							"when",
-							"poly",
+							"when/when",
+							"poly/es5",
 							"troopjs-core/component/signal/start",
 							"troopjs-core/component/signal/finalize",
 							"troopjs-dom/component"
