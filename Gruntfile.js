@@ -74,6 +74,10 @@ define(['troopjs-widget/version'], function (version) {\n\
 					"ext": ".min.js"
 				}]
 			}
+		},
+
+		"buster": {
+			"troopjs": {}
 		}
 	});
 
@@ -82,5 +86,6 @@ define(['troopjs-widget/version'], function (version) {\n\
 
 	grunt.registerTask("compile", [ "requirejs" ]);
 	grunt.registerTask("compress", [ "uglify" ]);
+	grunt.registerTask("test", [ "buster" ]);
 	grunt.registerTask("default", [ "compile", "compress" ]);
 };
