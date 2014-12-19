@@ -77,7 +77,7 @@ define(['troopjs-widget/version'], function (version) {\n\
 		},
 
 		"buster": {
-			"troopjs": {}
+			"bundles": {}
 		}
 	});
 
