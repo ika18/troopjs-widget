@@ -1,5 +1,5 @@
 define( [
-	"../application",
+	"troopjs-widget/application",
 	"jquery"
 ], function (Application, $) {
 	"use strict";

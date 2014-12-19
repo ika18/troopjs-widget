@@ -1,7 +1,7 @@
 define([
-	"../component",
-	"../weave",
-	"../unweave",
+	"troopjs-widget/component",
+	"troopjs-widget/weave",
+	"troopjs-widget/unweave",
 	"when/when",
 	"jquery"
 ], function (Widget, weave, unweave, when, $) {
