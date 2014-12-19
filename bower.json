@@ -6,8 +6,8 @@
     "bower_components"
   ],
   "dependencies": {
-    "troopjs-core": "^5",
-    "troopjs-dom": "^7",
+    "troopjs-core": "^5.1",
+    "troopjs-dom": "^7.1",
     "poly": "^0.6",
     "when": "3.4 - 3.6.0 || >3.6.1",
     "jquery": ">=1.8.1 <4",
