@@ -3,6 +3,3 @@ before_install:
   - npm install -g grunt-cli bower buster
   - npm install phantomjs
   - bower install
-branches:
-  except:
-    - /^build/
