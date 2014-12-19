@@ -3,7 +3,7 @@
  */
 define([
 	"./config",
-	"when",
+	"when/when",
 	"jquery",
 	"poly/array"
 ], function (config, when, $) {

@@ -6,7 +6,7 @@ define('troopjs-widget/version',[], { 'toString': function () { return ; } });
 define('troopjs-widget/config',[
 	"troopjs-dom/config",
 	"module",
-	"mu-merge"
+	"mu-merge/main"
 ], function (config, module, merge) {
 	
 
@@ -59,9 +59,9 @@ define('troopjs-widget/weave',[
 	"./config",
 	"troopjs-core/component/signal/start",
 	"require",
-	"when",
+	"when/when",
 	"jquery",
-	"mu-getargs",
+	"mu-getargs/main",
 	"poly/array"
 ], function (config, start, parentRequire, when, $, getargs) {
 	
@@ -270,7 +270,7 @@ define('troopjs-widget/weave',[
 define('troopjs-widget/unweave',[
 	"./config",
 	"troopjs-core/component/signal/finalize",
-	"when",
+	"when/when",
 	"jquery",
 	"poly/array"
 ], function (config, finalize, when, $) {
@@ -450,7 +450,7 @@ define('troopjs-widget/unweave',[
  */
 define('troopjs-widget/woven',[
 	"./config",
-	"when",
+	"when/when",
 	"jquery",
 	"poly/array"
 ], function (config, when, $) {
@@ -596,7 +596,7 @@ define('troopjs-widget/application',[
 	"troopjs-core/component/signal/start",
 	"troopjs-core/component/signal/stop",
 	"troopjs-core/component/signal/finalize",
-	"when"
+	"when/when"
 ], function (Widget, initialize, start, stop, finalize, when) {
 	
 
@@ -712,7 +712,7 @@ define('troopjs-widget/application',[
  */
 define('troopjs-widget/plugin',[
 	"jquery",
-	"when",
+	"when/when",
 	"./config",
 	"./weave",
 	"./unweave",
