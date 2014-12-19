@@ -1,6 +1,6 @@
 define([
-	"../component",
-	"../weave",
+	"troopjs-widget/component",
+	"troopjs-widget/weave",
 	"jquery"
 ], function (Widget, weave, $) {
 	"use strict";
