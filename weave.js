@@ -35,11 +35,11 @@ define([
 	/**
 	 * Weaves `$element`
 	 * @param {String} weave_attr
-	 * @param {Array} start_args
+	 * @param {Array} constructor_args
 	 * @return {Promise}
 	 * @ignore
 	 */
-	function $weave(weave_attr, start_args) {
+	function $weave(weave_attr, constructor_args) {
 		// Let `$element` be `this`
 		var $element = this;
 
@@ -90,6 +90,9 @@ define([
 			// Let `weave_arg[DEFERRED]` be `when.defer()`
 			// Push `weave_arg[DEFERRED].promise` on `$weft`
 			ARRAY_PUSH.call($weft, (weave_arg[DEFERRED] = when.defer()).promise);
+
+			// Push `constructor_args` on `weave_arg`
+			ARRAY_PUSH.apply(weave_arg, constructor_args);
 		}
 
 		// Start async promise chain
@@ -129,7 +132,7 @@ define([
 					// TroopJS >= 2.x
 					else {
 						// Start widget
-						start.apply(widget, start_args)
+						start.call(widget)
 							// Yield
 							.yield(widget)
 							// Link
@@ -193,8 +196,8 @@ define([
 	 * @return {Promise} Promise for the completion of weaving all widgets.
 	 */
 	return function weave() {
-		// Let `start_args` be `arguments`
-		var start_args = arguments;
+		// Let `constructor_args` be `arguments`
+		var constructor_args = arguments;
 
 		// Wait for map (sync) and weave (async)
 		return when.all(ARRAY_MAP.call(this, function (element) {
@@ -205,7 +208,7 @@ define([
 			// Make sure to remove ATTR_WEAVE asap in case someone else tries to `weave` again
 			$element.removeAttr(ATTR_WEAVE);
 			// Attempt weave
-			return $weave.call($element, weave_attr, start_args);
+			return $weave.call($element, weave_attr, constructor_args);
 		}));
 	}
 });
