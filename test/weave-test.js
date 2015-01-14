@@ -84,18 +84,18 @@ define([
 			});
 		},
 
-		"weaving with attribute arguments": function () {
+		"weaving with arguments": function () {
 			var $el = this.$el;
 			var name = "troopjs-widget/test/args";
 
-			$el.attr("data-weave", name + "(true, 1, 'string')");
+			$el.attr("data-weave", name + "(true, 1, 'foo')");
 
-			return weave.call($el).spread(function (widgets) {
+			return weave.call($el, false, 2, "bar").spread(function (widgets) {
 				var widget = widgets[0];
 
 				refute.defined($el.attr("data-weave"), "`data-weave` attribute was not cleared");
 				assert.equals($el.attr("data-woven"), widget.toString(), "`data-woven` does not match `widget.toString()`");
-				assert.equals(widget.args.slice(1), [ name, true, 1, "string" ], "arguments not passed correctly");
+				assert.equals(widget.args.slice(1), [ name, true, 1, "foo", false, 2, "bar" ], "arguments not passed correctly");
 				assert.equals(widget.displayName, name, "`displayName` does not match (required) module");
 				assert.equals(widget.phase, "started", "`phase` is not `started`");
 			});
