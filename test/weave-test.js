@@ -14,76 +14,99 @@ define([
 			this.$el = $("<div></div>");
 		},
 
-		"one widget": {
-			"weave": function () {
-				var $el = this.$el.attr("data-weave", "troopjs-widget/component");
+		"weaving one widget": function () {
+			var $el = this.$el;
+			var name = "troopjs-widget/component";
 
-				return weave.call($el).spread(function (woven) {
-					var widget = woven[0];
+			$el.attr("data-weave", name);
 
-					// data-weave attribute is cleared.
-					refute.defined($el.attr("data-weave"));
-					assert.equals(widget.displayName, "troopjs-widget/component");
-					assert.equals($el.attr("data-woven"), widget.toString());
-					assert.equals(widget.phase, "started");
-				});
-			},
+			return weave.call($el).spread(function (widgets) {
+				assert.equals(widgets.length, 1, "one widget expected to be woven");
 
-			"fail to initialize": function () {
-				var $el = this.$el.attr("data-weave", "troopjs-widget/test/thrown");
+				var widget = widgets[0];
 
-				return weave.call($el).otherwise(function (e) {
-					assert.equals(e.message, "initialize failure");
-				});
-			}
+				refute.defined($el.attr("data-weave"), "`data-weave` attribute was not cleared");
+				assert.equals($el.attr("data-woven"), widget.toString(), "`data-woven` does not match `widget.toString()`");
+				assert.equals(widget.displayName, name, "`displayName` does not match (required) module");
+				assert.equals(widget.phase, "started", "`phase` is not `started`");
+			});
 		},
 
-		"two widgets": {
-			"one with parameters": function () {
-				var $el = this.$el.attr("data-weave", "troopjs-widget/component troopjs-widget/component(true, 1, 'string()')");
+		"weaving multiple widgets": function () {
+			var $el = this.$el;
+			var foo_name = "troopjs-widget/component";
+			var bar_name = "troopjs-widget/test/default";
 
-				return weave.call($el).spread(function (woven) {
-					// Two widgets received.
-					var foo = woven[0];
-					var bar = woven[1];
+			$el.attr("data-weave", [ foo_name, bar_name].join(" "));
 
-					// data-weave attribute is cleared.
-					refute.defined($el.attr("data-weave"));
+			return weave.call($el).spread(function (widgets) {
+				assert.equals(widgets.length, 2, "two widgets expected to be woven");
 
-					// Two widgets should share the same DOM element.
-					assert.same($el.get(0), foo.$element.get(0));
-					assert.same($el.get(0), bar.$element.get(0));
+				var foo_widget = widgets[0];
+				var bar_widget = widgets[1];
 
-					// The woven attribute should consist of two widgets.
-					assert.equals([foo.toString(), bar.toString()].join(" "), $el.attr("data-woven"));
+				refute.defined($el.attr("data-weave"), "`data-weave` attribute was not cleared");
+				assert.equals($el.attr("data-woven"), [ foo_widget.toString(), bar_widget.toString() ].join(" "), "`foo_widget` and `bar_widget` expected to appear in `data-woven` attribute");
 
-					assert.equals(foo.phase, "started");
-					assert.equals(bar.phase, "started");
+				assert.equals(foo_widget.displayName, foo_name, "`displayName` does not match (required) module");
+				assert.equals(foo_widget.phase, "started", "`phase` is not `started`");
+
+				assert.equals(bar_widget.displayName, bar_name, "`displayName` does not match (required) module");
+				assert.equals(bar_widget.phase, "started", "`phase` is not `started`");
+			});
+		},
+
+		"progressive weaving": function () {
+			var $el = this.$el;
+			var foo_name = "troopjs-widget/component";
+			var bar_name = "troopjs-widget/test/default";
+
+			$el.attr("data-weave", foo_name);
+
+			return weave.call($el).spread(function (one_widgets) {
+				var foo_widget = one_widgets[0];
+
+				refute.defined($el.attr("data-weave"), "`data-weave` attribute was not cleared");
+				assert.equals($el.attr("data-woven"), foo_widget.toString(), "`data-woven` does not match `widget.toString()`");
+				assert.equals(foo_widget.displayName, foo_name, "`displayName` does not match (required) module");
+				assert.equals(foo_widget.phase, "started", "`phase` is not `started`");
+
+				$el.attr("data-weave", bar_name);
+
+				return weave.call($el).spread(function (two_widgets) {
+					var bar_widget = two_widgets[0];
+
+					refute.defined($el.attr("data-weave"), "`data-weave` attribute was not cleared");
+					assert.equals($el.attr("data-woven"), [ foo_widget.toString(), bar_widget.toString() ].join(" "), "`foo_widget` and `bar_widget` expected to appear in `data-woven` attribute");
+					assert.equals(bar_widget.displayName, bar_name, "`displayName` does not match (required) module");
+					assert.equals(bar_widget.phase, "started", "`phase` is not `started`");
 				});
-			},
+			});
+		},
 
-			"dynamic weaving": function () {
-				var $el = this.$el.attr("data-weave", "troopjs-widget/component");
+		"weaving with attribute arguments": function () {
+			var $el = this.$el;
+			var name = "troopjs-widget/test/args";
 
-				return weave.call($el).spread(function (widgets) {
-					var foo = widgets[0];
+			$el.attr("data-weave", name + "(true, 1, 'string')");
 
-					$el.attr("data-weave", "troopjs-widget/test/default");
+			return weave.call($el).spread(function (widgets) {
+				var widget = widgets[0];
 
-					return weave.call($el).spread(function (widgets) {
-						assert.equals(widgets.length, 1);
+				refute.defined($el.attr("data-weave"), "`data-weave` attribute was not cleared");
+				assert.equals($el.attr("data-woven"), widget.toString(), "`data-woven` does not match `widget.toString()`");
+				assert.equals(widget.args.slice(1), [ name, true, 1, "string" ], "arguments not passed correctly");
+				assert.equals(widget.displayName, name, "`displayName` does not match (required) module");
+				assert.equals(widget.phase, "started", "`phase` is not `started`");
+			});
+		},
 
-						var bar = widgets[0];
+		"fail to initialize": function () {
+			var $el = this.$el.attr("data-weave", "troopjs-widget/test/thrown");
 
-						assert.equals(bar.displayName, "troopjs-widget/test/default");
-
-						// data-unweave attribute should be cleared afterward.
-						refute.defined($el.attr("data-weave"));
-						// "foo" and "bar" appears in data-woven attribute.
-						assert.equals($el.attr("data-woven"), [ foo.toString(), bar.toString() ].join(" "));
-					});
-				});
-			}
+			return weave.call($el).otherwise(function (e) {
+				assert.equals(e.message, "initialize failure", "expected `sig/initialize` to throw");
+			});
 		},
 
 		"tearDown": function () {
