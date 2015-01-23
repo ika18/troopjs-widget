@@ -168,8 +168,8 @@ define('troopjs-widget/weave',[
 					// Create widget instance
 					widget = Widget.apply(Widget, widget_args);
 
-					// TroopJS <= 1.x
-					if (widget.trigger) {
+					// TroopJS <= 1.x (detect presence of ComposeJS)
+					if (widget.constructor._getBases) {
 						// Let `$deferred` be `$.Deferred()`
 						$deferred = $.Deferred();
 
