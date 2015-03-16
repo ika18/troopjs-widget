@@ -554,7 +554,7 @@ define('troopjs-widget/component',[
 		 * @localdoc Calls {@link #method-weave} to ensure newly rendered html is woven
 		 */
 		"sig/render": function ($target) {
-			return weave.apply($target.find(SELECTOR_WEAVE), ARRAY_SLICE.call(arguments, 1));
+			return weave.apply($target.find(SELECTOR_WEAVE).addBack(SELECTOR_WEAVE), ARRAY_SLICE.call(arguments, 1));
 		},
 
 		/**
