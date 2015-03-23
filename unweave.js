@@ -5,8 +5,7 @@ define([
 	"./config",
 	"troopjs-core/component/signal/finalize",
 	"when/when",
-	"jquery",
-	"poly/array"
+	"jquery"
 ], function (config, finalize, when, $) {
 	"use strict";
 
