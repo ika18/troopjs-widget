@@ -6,11 +6,10 @@
     "bower_components"
   ],
   "dependencies": {
-    "troopjs": ">=3.0.0-rc.1",
-    "poly": "^0.6",
+    "troopjs": "^3",
     "when": "3.4 - 3.6.0 || >3.6.1",
     "jquery": ">=1.8.1 <4",
-    "mu-merge": "^0",
+    "mu-merge": "^0.0.2",
     "mu-getargs": "^0"
   }
 }

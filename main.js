@@ -61,8 +61,7 @@ define('troopjs-widget/weave',[
 	"require",
 	"when/when",
 	"jquery",
-	"mu-getargs/main",
-	"poly/array"
+	"mu-getargs/main"
 ], function (config, start, parentRequire, when, $, getargs) {
 	
 
@@ -274,8 +273,7 @@ define('troopjs-widget/unweave',[
 	"./config",
 	"troopjs-core/component/signal/finalize",
 	"when/when",
-	"jquery",
-	"poly/array"
+	"jquery"
 ], function (config, finalize, when, $) {
 	
 
@@ -454,8 +452,7 @@ define('troopjs-widget/unweave',[
 define('troopjs-widget/woven',[
 	"./config",
 	"when/when",
-	"jquery",
-	"poly/array"
+	"jquery"
 ], function (config, when, $) {
 	
 
@@ -721,8 +718,7 @@ define('troopjs-widget/plugin',[
 	"./config",
 	"./weave",
 	"./unweave",
-	"./woven",
-	"poly/array"
+	"./woven"
 ], function ($, when, config, weave, unweave, woven) {
 	
 
