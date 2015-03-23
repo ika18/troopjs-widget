@@ -7,8 +7,7 @@ define([
 	"require",
 	"when/when",
 	"jquery",
-	"mu-getargs/main",
-	"poly/array"
+	"mu-getargs/main"
 ], function (config, start, parentRequire, when, $, getargs) {
 	"use strict";
 

@@ -4,8 +4,7 @@
 define([
 	"./config",
 	"when/when",
-	"jquery",
-	"poly/array"
+	"jquery"
 ], function (config, when, $) {
 	"use strict";
 

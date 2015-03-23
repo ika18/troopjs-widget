@@ -7,8 +7,7 @@ define([
 	"./config",
 	"./weave",
 	"./unweave",
-	"./woven",
-	"poly/array"
+	"./woven"
 ], function ($, when, config, weave, unweave, woven) {
 	"use strict";
 
