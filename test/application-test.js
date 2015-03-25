@@ -1,34 +1,35 @@
-define( [
-	"troopjs-widget/application",
-	"jquery"
-], function (Application, $) {
-	"use strict";
+define([
+  "buster",
+  "troopjs-widget/application",
+  "jquery"
+], function (buster, Application, $) {
+  "use strict";
 
-	var assert = buster.referee.assert;
+  var assert = buster.referee.assert;
 
-	buster.testCase("troopjs-widget/application", {
-		"setUp": function () {
-			this.$el = $("<div></div>");
-		},
+  buster.testCase("troopjs-widget/application", {
+    "setUp": function () {
+      this.$el = $("<div></div>");
+    },
 
-		"start/stop": function () {
-			var app = Application(this.$el);
+    "start/stop": function () {
+      var app = Application(this.$el);
 
-			return app
-				.start()
-				.then(function (phase) {
-					assert.equals(phase, "started");
-				})
-				.then(function () {
-					return app.stop();
-				})
-				.then(function (phase) {
-					assert.equals(phase, "finalized");
-				});
-		},
+      return app
+        .start()
+        .then(function (phase) {
+          assert.equals(phase, "started");
+        })
+        .then(function () {
+          return app.stop();
+        })
+        .then(function (phase) {
+          assert.equals(phase, "finalized");
+        });
+    },
 
-		"tearDown": function () {
-			this.$el.remove();
-		}
-	});
+    "tearDown": function () {
+      this.$el.remove();
+    }
+  });
 });
