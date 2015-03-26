@@ -7,8 +7,9 @@ define([
   "troopjs-core/component/signal/start",
   "troopjs-core/component/signal/stop",
   "troopjs-core/component/signal/finalize",
+  "troopjs-hub/emitter",
   "when/when"
-], function (Widget, initialize, start, stop, finalize, when) {
+], function (Widget, initialize, start, stop, finalize, hub, when) {
   "use strict";
 
   /**
@@ -16,6 +17,18 @@ define([
    * @class widget.application
    * @extend widget.component
    * @alias widget.application
+   */
+
+  /**
+   * Application start event
+   * @event hub/application/start
+   * @param {widget.application} application The started application
+   */
+
+  /**
+   * Application stop event
+   * @event hub/application/stop
+   * @param {widget.application} application The stopped application
    */
 
   var ARRAY_SLICE = Array.prototype.slice;
@@ -54,7 +67,8 @@ define([
 
     /**
      * @handler
-     * @localdoc weave all widgets that are within this element.
+     * @localdoc weave this and all widgets that are within this element.
+     * @fires hub/application/start
      * @inheritdoc
      */
     "sig/start": function () {
@@ -64,25 +78,34 @@ define([
       return when
         .map(me[COMPONENTS], function (component) {
           return start.apply(component, args);
-        }).then(function () {
+        })
+        .then(function () {
           return me.weave.apply(me, args);
+        })
+        .then(function () {
+          return hub.emit("application/start", me);
         });
     },
 
     /**
      * @handler
-     * @localdoc stop all woven widgets that are within this element.
+     * @localdoc stop this and all woven widgets that are within this element.
+     * @fires hub/application/stop
      * @inheritdoc
      */
     "sig/stop": function () {
       var me = this;
       var args = arguments;
 
-      return me.unweave.apply(me, args).then(function () {
-        return when.map(me[COMPONENTS], function (child) {
-          return stop.apply(child, args);
+      return me
+        .unweave.apply(me, args).then(function () {
+          return when.map(me[COMPONENTS], function (child) {
+            return stop.apply(child, args);
+          });
+        })
+        .then(function () {
+          return hub.emit("application/stop", me);
         });
-      });
     },
 
     /**
