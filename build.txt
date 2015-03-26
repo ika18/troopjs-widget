@@ -7,5 +7,8 @@ bower_components/../weave.js
 bower_components/../unweave.js
 bower_components/../woven.js
 bower_components/../component.js
+bower_components/troopjs-hub/config.js
+bower_components/troopjs-hub/executor.js
+bower_components/troopjs-hub/emitter.js
 bower_components/../application.js
 bower_components/../plugin.js
