@@ -6,8 +6,9 @@
     "bower_components"
   ],
   "dependencies": {
-    "troopjs-core": "^6.0.1",
-    "troopjs-dom": "^8.0.1",
+    "troopjs-core": "^7",
+    "troopjs-dom": "^8.1",
+    "troopjs-hub": "^1",
     "when": "3.4 - 3.6.0 || >3.6.1",
     "jquery": ">=1.8.1 <4",
     "mu-merge": "^0.0.2",
