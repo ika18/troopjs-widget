@@ -34,7 +34,7 @@ define([
     /**
      * Handles component render
      * @handler
-     * @inheritdoc
+     * @inheritdoc #event-sig/render
      * @localdoc Calls {@link #method-weave} to ensure newly rendered html is woven
      */
     "sig/render": function ($target) {
@@ -43,7 +43,7 @@ define([
 
     /**
      * @handler
-     * @inheritdoc
+     * @inheritdoc #event-dom/destroy
      * @localdoc Calls {@link #method-unweave} to ensure this element is unwoven
      */
     "dom/destroy": function () {

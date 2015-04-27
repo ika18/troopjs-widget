@@ -20,15 +20,22 @@ define([
    */
 
   /**
-   * Application start event
+   * Triggered when the application starts
    * @event hub/application/start
    * @param {widget.application} application The started application
    */
 
   /**
-   * Application stop event
+   * Triggered when the application stops
    * @event hub/application/stop
    * @param {widget.application} application The stopped application
+   */
+
+  /**
+   * Application components
+   * @private
+   * @readonly
+   * @property {core.component.emitter[]} components
    */
 
   var ARRAY_SLICE = Array.prototype.slice;
@@ -42,12 +49,6 @@ define([
    * @param {...core.component.emitter} component List of components to start before starting the application.
    */
   return Widget.extend(function () {
-    /**
-     * Application components
-     * @private
-     * @readonly
-     * @property {core.component.emitter[]} components
-     */
     this[COMPONENTS] = ARRAY_SLICE.call(arguments, 2);
   }, {
     "displayName": "widget/application",
@@ -67,9 +68,9 @@ define([
 
     /**
      * @handler
+     * @inheritdoc #event-sig/start
      * @localdoc weave this and all widgets that are within this element.
      * @fires hub/application/start
-     * @inheritdoc
      */
     "sig/start": function () {
       var me = this;
@@ -89,9 +90,9 @@ define([
 
     /**
      * @handler
+     * @inheritdoc #event-sig/stop
      * @localdoc stop this and all woven widgets that are within this element.
      * @fires hub/application/stop
-     * @inheritdoc
      */
     "sig/stop": function () {
       var me = this;
@@ -110,8 +111,8 @@ define([
 
     /**
      * @handler
-     * @localdoc finalize all registered components (widgets and services) that are registered from the {@link #method-constructor}.
      * @inheritdoc
+     * @localdoc finalize all registered components (widgets and services) that are registered from the {@link #method-constructor}.
      */
     "sig/finalize": function () {
       var args = arguments;
